@@ -1737,6 +1737,28 @@ int8_t nr_rrc_ue_decode_ccch( const protocol_ctxt_t *const ctxt_pP, const NR_SRB
 		  securityModeCommand->criticalExtensions.present);
  }
 
+void nr_rrc_ue_process_counterCheck(const protocol_ctxt_t *const ctxt_pP, uint8_t xid) {
+
+    uint8_t buffer[RRC_BUF_SIZE];
+    uint8_t size;
+    size = do_NR_CounterCheckResponse(buffer, sizeof(buffer), xid);
+    LOG_I(NR_RRC,
+        PROTOCOL_NR_RRC_CTXT_UE_FMT "Logical Channel UL-DCCH, Generating NR_CounterCheckResponse (bytes %d)\n",
+        PROTOCOL_NR_RRC_CTXT_UE_ARGS(ctxt_pP),
+        size);
+    rrc_data_req_nr_ue (
+     ctxt_pP,
+     DCCH,
+     nr_rrc_mui++,
+     SDU_CONFIRM_NO,
+     size,
+     buffer,
+     PDCP_TRANSMISSION_MODE_CONTROL);
+
+}
+
+
+
  //-----------------------------------------------------------------------------
  void nr_rrc_ue_generate_RRCSetupRequest(module_id_t module_id, const uint8_t gNB_index) {
    uint8_t i=0,rv[6];
@@ -2399,8 +2421,13 @@ nr_rrc_ue_establish_srb2(
 	     case NR_DL_DCCH_MessageType__c1_PR_spare3:
 	     case NR_DL_DCCH_MessageType__c1_PR_spare2:
 	     case NR_DL_DCCH_MessageType__c1_PR_spare1:
-	     case NR_DL_DCCH_MessageType__c1_PR_counterCheck:
 		 break;
+	     case NR_DL_DCCH_MessageType__c1_PR_counterCheck:
+          LOG_I(NR_RRC, "[UE %d] Received counterCheck (gNB %d)\n",
+               ctxt_pP->module_id, gNB_indexP);
+          nr_rrc_ue_process_counterCheck(ctxt_pP, dl_dcch_msg->message.choice.c1->choice.counterCheck->rrc_TransactionIdentifier);
+
+      break;
 	     case NR_DL_DCCH_MessageType__c1_PR_securityModeCommand:
          LOG_I(NR_RRC, "[UE %d] Received securityModeCommand (gNB %d)\n",
                ctxt_pP->module_id, gNB_indexP);

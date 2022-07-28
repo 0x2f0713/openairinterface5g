@@ -133,7 +133,6 @@ void rx_func(void *param) {
   start_meas(&softmodem_stats_rxtx_sf);
 
   // *******************************************************************
-
   if (NFAPI_MODE == NFAPI_MODE_PNF) {
     // I am a PNF and I need to let nFAPI know that we have a (sub)frame tick
     //LOG_D(PHY, "oai_nfapi_slot_ind(frame:%u, slot:%d) ********\n", frame_rx, slot_rx);

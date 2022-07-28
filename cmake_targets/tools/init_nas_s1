@@ -63,9 +63,9 @@ sudo sysctl -w net.ipv4.conf.all.rp_filter=0
 sudo ip route flush cache
 
 # Check table 200 lte in /etc/iproute2/rt_tables
-fgrep lte /etc/iproute2/rt_tables  > /dev/null 
+fgrep 5gnr /etc/iproute2/rt_tables  > /dev/null 
 if [ $? -ne 0 ]; then
-    echo "200 lte " >> /etc/iproute2/rt_tables
+    echo "200 5gnr " >> /etc/iproute2/rt_tables
 fi
-sudo ip rule add fwmark 1 table lte
-sudo ip route add default dev $LTEIF table lte
+sudo ip rule add fwmark 1 table 5gnr
+sudo ip route add default dev $LTEIF table 5gnr

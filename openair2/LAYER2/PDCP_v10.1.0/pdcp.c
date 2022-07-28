@@ -630,6 +630,8 @@ pdcp_data_ind(
 )
 //-----------------------------------------------------------------------------
 {
+
+  LOG_I(PDCP, "Call pdcp_data_ind\n");
   pdcp_t      *pdcp_p          = NULL;
   uint8_t      pdcp_header_len = 0;
   uint8_t      pdcp_tailer_len = 0;
@@ -848,6 +850,7 @@ pdcp_data_ind(
         pdcp_p->rx_hfn++;
       }
 
+      LOG_I(MAC, "Push data to RRC layer\n");
       rrc_data_ind(ctxt_pP,
                    rb_id,
                    sdu_buffer_sizeP - pdcp_header_len - pdcp_tailer_len,

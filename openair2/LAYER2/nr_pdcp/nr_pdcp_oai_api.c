@@ -613,6 +613,7 @@ uint64_t nr_pdcp_module_init(uint64_t _pdcp_optmask, int id)
 static void deliver_sdu_drb(void *_ue, nr_pdcp_entity_t *entity,
                             char *buf, int size)
 {
+  LOG_I(PDCP, "Call deliver_sdu_drb\n");
   nr_pdcp_ue_t *ue = _ue;
   int rb_id;
   int i;
@@ -719,6 +720,7 @@ rb_found:
 static void deliver_sdu_srb(void *_ue, nr_pdcp_entity_t *entity,
                             char *buf, int size)
 {
+  LOG_I(PDCP, "Call deliver_sdu_srb\n");
   nr_pdcp_ue_t *ue = _ue;
   int srb_id;
   int i;
@@ -875,6 +877,7 @@ static void add_srb(int is_gnb, int rnti, struct NR_SRB_ToAddMod *s,
                     unsigned char *ciphering_key,
                     unsigned char *integrity_key)
 {
+  LOG_I(PDCP, "Call add_srb\n");
   nr_pdcp_entity_t *pdcp_srb;
   nr_pdcp_ue_t *ue;
   int t_Reordering=3000;
@@ -1048,6 +1051,8 @@ bool nr_rrc_pdcp_config_asn1_req(const protocol_ctxt_t *const  ctxt_pP,
   int rnti = ctxt_pP->rnti;
   int i;
 
+
+  LOG_I(PDCP, "Call nr_rrc_pdcp_config_asn1_req\n");
   if (//ctxt_pP->enb_flag != 1 ||
       ctxt_pP->module_id != 0 ||
       ctxt_pP->instance != 0 ||

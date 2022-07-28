@@ -1541,6 +1541,7 @@ void init_RU_proc(RU_t *ru) {
     threadCreate( &proc->pthread_emulateRF, emulatedRF_thread, (void *)proc, "emulateRF", -1, OAI_PRIORITY_RT );
 
   if (get_thread_worker_conf() == WORKER_ENABLE) {
+    printf("WORKER_ENABLED\n");
     if (ru->feprx) nr_init_feprx_thread(ru);
 
     if (ru->feptx_ofdm) nr_init_feptx_thread(ru);

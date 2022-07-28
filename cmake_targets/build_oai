@@ -662,7 +662,7 @@ function main() {
       
   fi
   
-  if [ "$UE" = 1 ] ; then
+  if [ "$UE" = 1 ] || [ "$nrUE" = 1 ] ; then
 
     echo_info "Compiling UE specific part"
 

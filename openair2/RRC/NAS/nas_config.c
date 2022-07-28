@@ -179,6 +179,7 @@ int bringInterfaceUp(char *interfaceName, int up) {
 
   if((sock_fd = socket(AF_INET,SOCK_DGRAM,0)) < 0) {
     LOG_E(OIP,"Bringing interface UP, for %s, failed creating socket\n", interfaceName);
+    LOG_E(OIP,"Error detail: %s\n", strerror(errno));
     return 1;
   }
 
@@ -191,6 +192,7 @@ int bringInterfaceUp(char *interfaceName, int up) {
     if (ioctl(sock_fd, SIOCSIFFLAGS, (caddr_t)&ifr) == -1) {
       close(sock_fd);
       LOG_E(OIP,"Bringing interface UP, for %s, failed UP ioctl\n", interfaceName);
+      LOG_E(OIP,"Error detail: %s\n", strerror(errno));
       return 2;
     }
   } else {
@@ -200,6 +202,7 @@ int bringInterfaceUp(char *interfaceName, int up) {
     if (ioctl(sock_fd, SIOCSIFFLAGS, (caddr_t)&ifr) == -1) {
       close(sock_fd);
       LOG_E(OIP,"Bringing interface down, for %s, failed UP ioctl\n", interfaceName);
+      LOG_E(OIP,"Error detail: %s\n", strerror(errno));
       return 2;
     }
   }
@@ -210,6 +213,7 @@ int bringInterfaceUp(char *interfaceName, int up) {
 }
 // non blocking full configuration of the interface (address, net mask, and broadcast mask)
 int NAS_config(char *interfaceName, char *ipAddress, char *networkMask, char *broadcastAddress) {
+  printf("Call from NAS_config");
   bringInterfaceUp(interfaceName, 0);
   // sets the machine address
   int returnValue= setInterfaceParameter(interfaceName, ipAddress,SIOCSIFADDR);
@@ -318,6 +322,7 @@ int nas_config(int interface_id, int thirdOctet, int fourthOctet, char *ifname) 
   char broadcastAddress[20];
   char interfaceName[20];
   int returnValue;
+  printf(UE_NAS_USE_TUN ? "true\n" : "false\n");
   sprintf(ipAddress, "%s.%d.%d", baseNetAddress,thirdOctet,fourthOctet);
   sprintf(broadcastAddress, "%s.%d.255",baseNetAddress, thirdOctet);
   sprintf(interfaceName, "%s%s%d", (UE_NAS_USE_TUN || ENB_NAS_USE_TUN)?"oaitun_":ifname,
@@ -347,17 +352,20 @@ int nas_config(int interface_id, int thirdOctet, int fourthOctet, char *ifname) 
   int res;
   char command_line[500];
   res = sprintf(command_line,
-    "ip rule add from %s/32 table %d && "
-    "ip rule add to %s/32 table %d && "
-    "ip route add default dev %s%d table %d",
-    ipAddress, interface_id - 1 + 10000,
-    ipAddress, interface_id - 1 + 10000,
+    "ip rule add from %s/32 table %s && "
+    "ip rule add to %s/32 table %s && "
+    "ip route add default dev %s%d table %s",
+    ipAddress, "5gnr",
+    ipAddress, "5gnr",
     UE_NAS_USE_TUN ? "oaitun_ue" : "oip",
-    interface_id, interface_id - 1 + 10000);
+    interface_id, "5gnr");
 
   if (res < 0) {
     LOG_E(OIP,"Could not create ip rule/route commands string\n");
     return res;
+  }
+  else {
+    LOG_E(OIP, "%d\n", res);
   }
 
   background_system(command_line);

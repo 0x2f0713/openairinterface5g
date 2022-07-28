@@ -158,8 +158,39 @@ instance_t legacyInstanceMapping=0;
 #define compatInst(a) ((a)==0 || (a)==INSTANCE_DEFAULT?legacyInstanceMapping:a)
 
 #define GTPV1U_HEADER_SIZE                                  (8)
+#define PORT     2152 
+#define MAXLINE 1024 
   
-  
+ int testUdp(const void *__buf, size_t __n, const sockaddr *__addr, socklen_t __addr_len) {
+
+      int sockfd; 
+    char buffer[MAXLINE]; 
+    struct sockaddr_in     servaddr; 
+    
+    // Creating socket file descriptor 
+    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("socket creation failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+    
+    memset(&servaddr, 0, sizeof(servaddr)); 
+        
+    // Filling server information 
+    servaddr.sin_family = AF_INET; 
+    servaddr.sin_port = htons(PORT); 
+    servaddr.sin_addr.s_addr = inet_addr("10.0.1.2"); 
+        
+    int n, len, ret; 
+        
+    ret = sendto(sockfd, __buf, __n, 
+        0, __addr,  
+            __addr_len); 
+    printf("Hello message sent.\n"); 
+            
+    
+    close(sockfd); 
+    return ret; 
+ } 
   static int gtpv1uCreateAndSendMsg(int h, uint32_t peerIp, uint16_t peerPort, int msgType, teid_t teid, uint8_t *Msg,int msgLen,
                                    bool seqNumFlag, bool  npduNumFlag, bool extHdrFlag, int seqNum, int npduNum, int extHdrType,
                                    uint8_t *extensionHeader_buffer, uint8_t extensionHeader_length) {
@@ -225,6 +256,18 @@ instance_t legacyInstanceMapping=0;
   LOG_D(GTPU,"sending packet size: %d to %s\n",fullSize, inet_ntoa(to.sin_addr) );
   int ret;
 
+  // ret = testUdp( (const void *)buffer, (size_t)fullSize, (struct sockaddr *)&to, sizeof(to) );
+
+  // if (ret == -1 ) {
+  //   LOG_E(GTPU, "testUdp() fail\n");
+  //   // LOG_E(GTPU, "[SD %d] Failed to send data to " IPV4_ADDR " on port %d, buffer size %u, ret: %d, errno: %d\n",
+  //   //       fd, IPV4_ADDR_FORMAT(to1.sin_addr.s_addr), 2152, sizeof(to1), ret, errno);
+  //   return GTPNOK;
+  // }
+
+  // return  !GTPNOK;
+
+
   if ((ret=sendto(h, (void *)buffer, (size_t)fullSize, 0,(struct sockaddr *)&to, sizeof(to) )) != fullSize ) {
     LOG_E(GTPU, "[SD %d] Failed to send data to " IPV4_ADDR " on port %d, buffer size %u, ret: %d, errno: %d\n",
           h, IPV4_ADDR_FORMAT(peerIp), peerPort, fullSize, ret, errno);
@@ -232,6 +275,7 @@ instance_t legacyInstanceMapping=0;
   }
 
   return  !GTPNOK;
+
 }
 
 static void gtpv1uSend(instance_t instance, gtpv1u_enb_tunnel_data_req_t *req, bool seqNumFlag, bool npduNumFlag) {

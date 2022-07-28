@@ -346,6 +346,20 @@ void nr_dl(void *_d, event e)
 {
   ev_data *d = _d;
 
+  if (e.e[d->dl_rnti].i == 0xffff) {
+    if (d->no_sib) return;
+
+    if (d->max_sib && d->cur_sib == d->max_sib) return;
+
+    d->cur_sib++;
+  }
+
+  // trace_lte(d, DIRECTION_DOWNLINK,
+  //           e.e[d->dl_rnti].i != 0xffff ? C_RNTI : SI_RNTI, e.e[d->dl_rnti].i,
+  //           e.e[d->dl_frame].i, e.e[d->dl_subframe].i,
+  //           e.e[d->dl_data].b, e.e[d->dl_data].bsize,
+  //           NO_PREAMBLE, NO_SR_RNTI);
+
   trace_nr(d, NR_DIRECTION_DOWNLINK, NR_C_RNTI, e.e[d->nr_dl_rnti].i,
            e.e[d->nr_dl_frame].i, e.e[d->nr_dl_slot].i,
            e.e[d->nr_dl_harq_pid].i, e.e[d->nr_dl_data].b,

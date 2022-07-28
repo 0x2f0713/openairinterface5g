@@ -141,7 +141,7 @@ extern "C" {
     t->message_queue.insert(t->message_queue.begin(), message);
     eventfd_t sem_counter = 1;
     AssertFatal ( sizeof(sem_counter) == write(t->sem_fd, &sem_counter, sizeof(sem_counter)), "");
-    LOG_D(ITTI,"sent messages id=%d to %s\n",message_id, t->admin.name);
+    // LOG_I(ITTI,"sent messages id=%d from %s to %s\n",message_id, itti_get_task_name(message->ittiMsgHeader.originTaskId), t->admin.name);
     return 0;
   }
 
